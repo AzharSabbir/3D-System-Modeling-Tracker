@@ -129,7 +129,6 @@
             color: white;
         }
 
-        /* Sidebar Overlay (Mobile) */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -234,7 +233,6 @@
             justify-content: space-between;
             align-items: center;
             overflow-x: auto;
-            /* Scroll on mobile */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -313,7 +311,7 @@
             color: var(--c-completed);
         }
 
-        /* --- SYSTEM ROW LAYOUT (Desktop Default) --- */
+        /* --- SYSTEM ROW LAYOUT --- */
         .system-row {
             display: grid;
             grid-template-columns: 1.5fr 4fr 0.5fr 1.2fr 0.5fr;
@@ -348,6 +346,7 @@
             line-height: 1.5;
         }
 
+        /* New Layer Layout: Grid with separation */
         .col-layers {
             display: flex;
             flex-direction: column;
@@ -358,12 +357,14 @@
         }
 
         .layer-detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            /* Name takes space, Size takes auto */
+            gap: 15px;
             padding: 8px 12px;
             border-bottom: 1px solid #e2e8f0;
             font-size: 0.9rem;
+            align-items: center;
         }
 
         .layer-detail-row:last-child {
@@ -373,18 +374,30 @@
         .lname {
             font-weight: 600;
             color: #334155;
-            flex: 1;
             overflow-wrap: anywhere;
-            margin-right: 15px;
             line-height: 1.4;
         }
 
-        .lsize {
+        /* The Separate Box for Mills */
+        .lsize-box {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-family: monospace;
-            color: #64748b;
-            font-weight: 500;
-            flex-shrink: 0;
+            color: #0f172a;
+            font-weight: 600;
+            font-size: 0.85rem;
             white-space: nowrap;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .lsize-box span {
+            color: #94a3b8;
+            font-weight: 400;
+            font-size: 0.75rem;
+            margin-left: 2px;
         }
 
         .col-rev {
@@ -497,6 +510,22 @@
             margin-bottom: 8px;
         }
 
+        /* Input group with auto-mills label */
+        .input-mills-group {
+            display: flex;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .input-mills-suffix {
+            position: absolute;
+            right: 10px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -510,12 +539,8 @@
             color: #94a3b8;
         }
 
-        /* ========================================= */
-        /* === MOBILE RESPONSIVENESS (Magic) === */
-        /* ========================================= */
+        /* MOBILE RESPONSIVENESS */
         @media (max-width: 768px) {
-
-            /* Sidebar hidden by default */
             .sidebar {
                 position: fixed;
                 height: 100%;
@@ -538,7 +563,6 @@
                 display: block;
             }
 
-            /* Header adjustments */
             .menu-btn {
                 display: block;
             }
@@ -561,14 +585,10 @@
                 border-radius: 50px;
             }
 
-            /* Hide Delete Batch text to save space, maybe just icon, but keeping simple for now */
-
-            /* Content Padding */
             .content-area {
                 padding: 15px;
             }
 
-            /* Flatten the Grid Row to Vertical Card */
             .system-row {
                 display: flex;
                 flex-direction: column;
@@ -582,15 +602,11 @@
                 padding-right: 40px;
             }
 
-            /* Space for Edit button */
-
-            /* Position Edit button absolute top-right */
             .btn-edit-text {
                 position: absolute;
                 top: 15px;
                 right: 15px;
                 margin: 0;
-                font-size: 0.85rem;
                 background: #f1f5f9;
                 padding: 4px 8px;
                 border-radius: 4px;
@@ -601,7 +617,6 @@
                 width: 100%;
             }
 
-            /* Bottom row of card: Rev | Status */
             .col-rev {
                 display: inline-block;
                 width: auto;
@@ -609,7 +624,6 @@
                 margin-bottom: 5px;
             }
 
-            /* Modal Resizing */
             .modal {
                 width: 95%;
                 padding: 20px;
@@ -735,7 +749,7 @@
                         type="checkbox" id="sysActive"> <span style="font-weight:600; font-size:0.9rem;">Mark as Active
                         Work</span></label></div>
             <div class="form-group">
-                <label class="form-label">Layers & Sizes (Mils)</label>
+                <label class="form-label">Layers & Sizes (Only Numbers & '-')</label>
                 <div class="layer-area" id="layerContainer"></div>
                 <button class="btn" style="width:100%; border:1px dashed #cbd5e1; color:#64748b"
                     onclick="addLayerInput()">+ Add Layer</button>
@@ -751,7 +765,6 @@
         let allData = [];
         let currentBatch = null;
 
-        // --- MOBILE MENU TOGGLE ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('show');
             document.querySelector('.sidebar-overlay').classList.toggle('show');
@@ -770,7 +783,7 @@
             if (!allData.length) return alert("No Data");
             let csvContent = "\uFEFFBatch,System,Revision,Status,Layers Details\n";
             allData.forEach(s => {
-                let layersArr = (s.layers_data || []).map(l => `${l.name} (${l.size})`);
+                let layersArr = (s.layers_data || []).map(l => `${l.name} (${l.size} mils)`);
                 const layersStr = `"${layersArr.join(' | ')}"`;
                 const systemName = `"${s.system_name}"`;
                 csvContent += `"${s.batch_number}",${systemName},${s.revision_status},${s.completion_status},${layersStr}\n`;
@@ -795,7 +808,6 @@
                     currentBatch = b;
                     renderSidebar();
                     renderContent(b);
-                    // On mobile, close sidebar after selecting
                     if (window.innerWidth <= 768) toggleSidebar();
                 };
                 list.appendChild(li);
@@ -833,7 +845,7 @@
                         layersHtml += `
                             <div class="layer-detail-row">
                                 <span class="lname">${l.name}</span>
-                                <span class="lsize">${l.size}</span>
+                                <div class="lsize-box">${l.size}<span>mils</span></div>
                             </div>
                         `;
                     });
@@ -906,7 +918,11 @@
             div.className = 'layer-row-input';
             div.innerHTML = `
                 <input type="text" class="form-input" placeholder="Layer Name" value="${name}" style="flex:2">
-                <input type="text" class="form-input" placeholder="Mils (e.g. 6-8)" value="${size}" style="flex:1">
+                <div class="input-mills-group">
+                    <input type="text" class="form-input" placeholder="Size" value="${size}" style="flex:1" 
+                           oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
+                    <span class="input-mills-suffix">mils</span>
+                </div>
                 <button onclick="this.parentElement.remove()" style="border:none;background:none;color:red;cursor:pointer;">&times;</button>
             `;
             document.getElementById('layerContainer').appendChild(div);
@@ -946,16 +962,8 @@
 
         function scrollToSection(id) {
             const el = document.getElementById(`sec-${id}`);
-            // Smooth scroll with offset for sticky headers if needed
-            window.scrollTo({
-                top: el.offsetTop - 100,
-                behavior: 'smooth'
-            });
-            // Also scroll internal container
-            document.getElementById(`contentArea`).scrollTo({
-                top: el.offsetTop - 150,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' });
+            document.getElementById(`contentArea`).scrollTo({ top: el.offsetTop - 150, behavior: 'smooth' });
         }
 
         loadData();
