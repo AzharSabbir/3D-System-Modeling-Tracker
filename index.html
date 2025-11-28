@@ -4,23 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azhar 3D Model Tracking</title>
+    <title>Azhar 3D Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #f8f9fd;
-            --bg-sidebar: #111827;
-            --text-sidebar: #9ca3af;
+            --bg-body: #f3f4f6;
+            --bg-sidebar: #1f2937;
             --primary: #4f46e5;
-            /* Column Colors */
-            --col-progress: #e0f2fe;
-            --border-progress: #0ea5e9;
-            --col-revision: #fef9c3;
-            --border-revision: #eab308;
-            --col-completed: #dcfce7;
-            --border-completed: #22c55e;
-            --col-rejected: #fee2e2;
-            --border-rejected: #ef4444;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+
+            /* Minimalist Status Colors */
+            --c-backlog: #9ca3af;
+            --c-progress: #3b82f6;
+            --c-revision: #f59e0b;
+            --c-completed: #10b981;
         }
 
         * {
@@ -35,6 +33,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            color: var(--text-main);
         }
 
         /* --- SIDEBAR --- */
@@ -43,19 +42,18 @@
             background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 24px;
             color: white;
-            border-right: 1px solid #374151;
+            flex-shrink: 0;
         }
 
         .brand {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: white;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 35px;
+            white-space: nowrap;
+            letter-spacing: -0.5px;
         }
 
         .brand span {
@@ -63,30 +61,30 @@
         }
 
         .sidebar-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            color: #4b5563;
+            color: #6b7280;
             font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            letter-spacing: 0.8px;
         }
 
         .batch-list {
             flex: 1;
             overflow-y: auto;
             list-style: none;
+            margin-bottom: 20px;
         }
 
         .batch-item {
-            padding: 10px 12px;
-            margin-bottom: 5px;
+            padding: 10px 14px;
+            margin-bottom: 4px;
             border-radius: 6px;
             cursor: pointer;
-            color: var(--text-sidebar);
+            color: #d1d5db;
             font-size: 0.9rem;
-            transition: 0.2s;
-            display: flex;
-            justify-content: space-between;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
         }
 
         .batch-item:hover {
@@ -95,26 +93,43 @@
         }
 
         .batch-item.active {
-            background: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
             color: white;
-            font-weight: 500;
+            border-left-color: var(--primary);
         }
 
-        .btn-new-batch {
+        .sidebar-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-sidebar {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: transparent;
-            border: 1px dashed #4b5563;
+            border: 1px solid #374151;
             color: #9ca3af;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 20px;
+            font-size: 0.85rem;
             transition: 0.2s;
         }
 
-        .btn-new-batch:hover {
-            border-color: white;
+        .btn-sidebar:hover {
+            border-color: #6b7280;
             color: white;
+        }
+
+        .btn-export {
+            border: 1px dashed #4b5563;
+            color: #d1d5db;
+        }
+
+        .btn-export:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #9ca3af;
         }
 
         /* --- MAIN AREA --- */
@@ -123,11 +138,11 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            overflow: hidden;
         }
 
-        /* Header */
         .top-bar {
-            padding: 20px 30px;
+            padding: 20px 40px;
             background: white;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
@@ -138,19 +153,14 @@
         .batch-title h2 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #1f2937;
+            color: #111827;
         }
 
         .batch-title span {
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #9ca3af;
             font-weight: 400;
             margin-left: 10px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
         }
 
         .btn {
@@ -159,30 +169,36 @@
             border: none;
             font-weight: 500;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            transition: 0.2s;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
+            box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
         }
 
         .btn-danger {
-            background: #fee2e2;
+            background: white;
             color: #ef4444;
+            border: 1px solid #fee2e2;
         }
 
         .btn-danger:hover {
-            background: #ef4444;
-            color: white;
+            background: #fee2e2;
         }
 
-        /* Kanban Board */
+        /* --- KANBAN BOARD --- */
         .kanban-board {
             flex: 1;
             display: flex;
-            gap: 20px;
-            padding: 30px;
+            gap: 24px;
+            padding: 30px 40px;
             overflow-x: auto;
             background: var(--bg-body);
         }
@@ -192,64 +208,47 @@
             min-width: 280px;
             display: flex;
             flex-direction: column;
-            background: #f3f4f6;
-            border-radius: 12px;
-            padding: 15px;
             height: 100%;
         }
 
         .col-header {
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
             display: flex;
             justify-content: space-between;
-            color: #4b5563;
+            border-bottom: 2px solid transparent;
         }
 
         .col-count {
-            background: rgba(0, 0, 0, 0.1);
-            padding: 2px 8px;
+            background: #e5e7eb;
+            color: #6b7280;
+            padding: 1px 6px;
             border-radius: 10px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
-        /* Column Specific Colors */
-        .col-in-progress {
-            background: var(--col-progress);
+        .h-backlog {
+            border-color: var(--c-backlog);
+            color: var(--c-backlog);
         }
 
-        .col-in-progress .col-header {
-            border-color: var(--border-progress);
-            color: #0369a1;
+        .h-progress {
+            border-color: var(--c-progress);
+            color: var(--c-progress);
         }
 
-        .col-revision {
-            background: var(--col-revision);
+        .h-revision {
+            border-color: var(--c-revision);
+            color: var(--c-revision);
         }
 
-        .col-revision .col-header {
-            border-color: var(--border-revision);
-            color: #854d0e;
-        }
-
-        .col-completed {
-            background: var(--col-completed);
-        }
-
-        .col-completed .col-header {
-            border-color: var(--border-completed);
-            color: #15803d;
-        }
-
-        .col-rejected {
-            background: var(--col-rejected);
-        }
-
-        .col-rejected .col-header {
-            border-color: var(--border-rejected);
-            color: #b91c1c;
+        .h-completed {
+            border-color: var(--c-completed);
+            color: var(--c-completed);
         }
 
         .card-container {
@@ -257,137 +256,161 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            padding-bottom: 20px;
         }
 
-        /* Cards */
+        /* --- CARDS --- */
         .card {
             background: white;
-            padding: 15px;
+            padding: 16px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid transparent;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: all 0.2s;
             position: relative;
-            border-left: 4px solid transparent;
         }
 
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
         }
 
         .card.active-work {
-            border: 2px solid #111827;
+            border: 1.5px solid #1f2937;
         }
-
-        /* Black border for active work */
 
         .card-title {
             font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 5px;
+            color: #111827;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
         }
 
         .card-meta {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: #9ca3af;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         .rev-badge {
             background: #f3f4f6;
+            color: #4b5563;
             padding: 2px 6px;
             border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.7rem;
             border: 1px solid #e5e7eb;
         }
 
-        .card-layers {
-            background: #f9fafb;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: #4b5563;
-        }
-
-        .layer-row-s {
+        .layers-preview {
             display: flex;
-            justify-content: space-between;
-            border-bottom: 1px dashed #e5e7eb;
-            padding: 2px 0;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
         }
 
-        .active-label {
-            background: #111827;
-            color: white;
-            font-size: 0.65rem;
+        .layer-chip {
+            font-size: 0.7rem;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
             padding: 2px 6px;
             border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 5px;
-            font-weight: 700;
+            color: #6b7280;
         }
 
-        /* Modal */
+        .active-dot {
+            width: 8px;
+            height: 8px;
+            background: #1f2937;
+            border-radius: 50%;
+            position: absolute;
+            top: 18px;
+            right: 16px;
+        }
+
+        /* --- MODALS --- */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            backdrop-filter: blur(2px);
         }
 
         .modal {
             background: white;
-            width: 450px;
-            padding: 25px;
+            width: 420px;
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #111827;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .form-label {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 0.8rem;
+            font-weight: 600;
             color: #374151;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .form-input {
             width: 100%;
-            padding: 10px;
+            padding: 10px 12px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            ring: 2px solid rgba(79, 70, 229, 0.1);
         }
 
         .layer-area {
-            max-height: 150px;
+            max-height: 140px;
             overflow-y: auto;
             border: 1px solid #f3f4f6;
-            padding: 5px;
-            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
         }
 
-        .layer-input-group {
+        .layer-row {
             display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .hidden {
-            display: none;
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
         }
     </style>
 </head>
@@ -395,10 +418,14 @@
 <body>
 
     <div class="sidebar">
-        <div class="brand">🚀 Azhar 3D <span>Tracker</span></div>
+        <div class="brand">Azhar 3D <span>Tracker</span></div>
         <div class="sidebar-label">Projects / Batches</div>
         <ul class="batch-list" id="batchList"></ul>
-        <button class="btn-new-batch" onclick="createBatch()">+ Create New Batch</button>
+
+        <div class="sidebar-footer">
+            <button class="btn-sidebar" onclick="openBatchModal()">+ Create New Batch</button>
+            <button class="btn-sidebar btn-export" onclick="exportToCSV()">Export Data (CSV)</button>
+        </div>
     </div>
 
     <div class="main">
@@ -409,79 +436,93 @@
             </div>
             <div class="actions" id="headerActions" style="display:none;">
                 <button class="btn btn-danger" onclick="deleteBatch()">Delete Batch</button>
-                <button class="btn btn-primary" onclick="openModal()">+ Add System</button>
+                <button class="btn btn-primary" onclick="openSystemModal()">+ Add System</button>
             </div>
         </div>
 
         <div class="kanban-board" id="kanbanBoard" style="display:none;">
-            <div class="column col-in-progress">
-                <div class="col-header">In Progress <span class="col-count" id="count-in-progress">0</span></div>
+            <div class="column">
+                <div class="col-header h-backlog">Backlog <span class="col-count" id="c-backlog">0</span></div>
+                <div class="card-container" id="col-backlog"></div>
+            </div>
+            <div class="column">
+                <div class="col-header h-progress">In Progress <span class="col-count" id="c-progress">0</span></div>
                 <div class="card-container" id="col-in-progress"></div>
             </div>
-            <div class="column col-revision">
-                <div class="col-header">In Revision <span class="col-count" id="count-revision">0</span></div>
+            <div class="column">
+                <div class="col-header h-revision">In Revision <span class="col-count" id="c-revision">0</span></div>
                 <div class="card-container" id="col-revision"></div>
             </div>
-            <div class="column col-completed">
-                <div class="col-header">Completed <span class="col-count" id="count-completed">0</span></div>
+            <div class="column">
+                <div class="col-header h-completed">Completed <span class="col-count" id="c-completed">0</span></div>
                 <div class="card-container" id="col-completed"></div>
-            </div>
-            <div class="column col-rejected">
-                <div class="col-header">Rejected <span class="col-count" id="count-rejected">0</span></div>
-                <div class="card-container" id="col-rejected"></div>
             </div>
         </div>
 
-        <div id="emptyState" style="padding:50px; text-align:center; color:#9ca3af; display:block;">
-            <h2>Select or Create a Batch to start</h2>
+        <div id="emptyState" style="margin: auto; text-align: center; color: #9ca3af;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📂</div>
+            <h3>Select a Batch to start</h3>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-overlay" id="batchModalOverlay">
         <div class="modal">
-            <h3 style="margin-bottom:20px;" id="modalTitle">Add System</h3>
-            <input type="hidden" id="sysId">
+            <h3 class="modal-title">Create New Batch</h3>
+            <div class="form-group">
+                <label class="form-label">Batch Name / Order Number</label>
+                <input type="text" class="form-input" id="newBatchName" placeholder="e.g. Order #502 - Sneakers">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="border:1px solid #ddd"
+                    onclick="document.getElementById('batchModalOverlay').style.display='none'">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmCreateBatch()">Create Batch</button>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal-overlay" id="sysModalOverlay">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 class="modal-title" id="sysModalTitle">Add System</h3>
+                <button id="btnDeleteSys" class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;"
+                    onclick="deleteSystem()">Delete</button>
+            </div>
+            <input type="hidden" id="sysId">
             <div class="form-group">
                 <label class="form-label">System Name</label>
-                <input type="text" class="form-input" id="sysName" placeholder="e.g. Engine Case">
+                <input type="text" class="form-input" id="sysName" placeholder="e.g. Sole Unit">
             </div>
-
-            <div class="form-group" style="display:flex; gap:10px;">
-                <div style="flex:1">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div class="form-group">
                     <label class="form-label">Revision</label>
                     <input type="text" class="form-input" id="sysRev" placeholder="v1.0">
                 </div>
-                <div style="flex:1">
+                <div class="form-group">
                     <label class="form-label">Status</label>
                     <select class="form-input" id="sysStatus">
+                        <option value="backlog">Backlog</option>
                         <option value="in-progress">In Progress</option>
                         <option value="revision">In Revision</option>
                         <option value="completed">Completed</option>
-                        <option value="rejected">Rejected</option>
                     </select>
                 </div>
             </div>
-
             <div class="form-group">
                 <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
                     <input type="checkbox" id="sysActive">
-                    <span style="font-size:0.9rem; font-weight:600;">Currently Working On This?</span>
+                    <span style="font-size:0.85rem; font-weight:500;">Mark as Currently Working</span>
                 </label>
             </div>
-
             <div class="form-group">
                 <label class="form-label">Layers & Sizes</label>
                 <div class="layer-area" id="layerContainer"></div>
-                <button class="btn" style="width:100%; border:1px solid #eee;" onclick="addLayerInput()">+ Add
-                    Layer</button>
+                <button class="btn" style="width:100%; border:1px dashed #d1d5db; color:#6b7280"
+                    onclick="addLayerInput()">+ Add Layer Row</button>
             </div>
-
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                <button class="btn"
-                    onclick="document.getElementById('modalOverlay').style.display='none'">Cancel</button>
-                <button class="btn btn-primary" onclick="saveSystem()">Save</button>
-                <button id="btnDeleteSys" class="btn btn-danger hidden" onclick="deleteSystem()">Delete</button>
+            <div class="modal-footer">
+                <button class="btn" style="border:1px solid #ddd"
+                    onclick="document.getElementById('sysModalOverlay').style.display='none'">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSystem()">Save System</button>
             </div>
         </div>
     </div>
@@ -491,6 +532,7 @@
         let allData = [];
         let currentBatch = null;
 
+        // --- LOAD DATA ---
         async function loadData() {
             try {
                 const res = await fetch(API_URL);
@@ -500,17 +542,62 @@
             } catch (e) { console.error(e); }
         }
 
+        // --- EXPORT TO CSV (NEW FEATURE) ---
+        function exportToCSV() {
+            if (!allData || allData.length === 0) {
+                alert("No data to export!");
+                return;
+            }
+
+            // Define Columns
+            const headers = ['System ID', 'Batch Name', 'System Name', 'Status', 'Revision', 'Is Active', 'Created Date', 'Layers Info'];
+            const rows = [];
+
+            // Helper to escape commas for CSV
+            const safe = (text) => `"${String(text || '').replace(/"/g, '""')}"`;
+
+            allData.forEach(sys => {
+                const dateStr = new Date(sys.created_at).toLocaleDateString();
+
+                // Convert Layer JSON to string "Name:Size | Name:Size"
+                const layersStr = (sys.layers_data || []).map(l => `${l.name}:${l.size}`).join(' | ');
+
+                let status = sys.completion_status;
+                if (status === 'rejected') status = 'backlog (old)'; // map old status
+
+                rows.push([
+                    sys.id,
+                    safe(sys.batch_number),
+                    safe(sys.system_name),
+                    safe(status),
+                    safe(sys.revision_status),
+                    sys.is_active_work ? 'Yes' : 'No',
+                    dateStr,
+                    safe(layersStr)
+                ].join(','));
+            });
+
+            // Build CSV Content
+            const csvContent = [headers.join(','), ...rows].join('\n');
+
+            // Trigger Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Azhar_3D_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- SIDEBAR ---
         function renderSidebar() {
             const list = document.getElementById('batchList');
             list.innerHTML = '';
-
-            // Extract unique batches
             const batches = [...new Set(allData.map(d => d.batch_number).filter(Boolean))];
 
-            // Add the "Current Batch" if it's new and has no systems yet
-            if (currentBatch && !batches.includes(currentBatch)) {
-                batches.push(currentBatch);
-            }
+            if (currentBatch && !batches.includes(currentBatch)) batches.push(currentBatch);
 
             batches.forEach(b => {
                 const li = document.createElement('li');
@@ -521,19 +608,26 @@
             });
         }
 
-        function createBatch() {
-            const name = prompt("Enter Name for New Batch:");
+        // --- BATCH ACTIONS ---
+        function openBatchModal() {
+            document.getElementById('newBatchName').value = '';
+            document.getElementById('batchModalOverlay').style.display = 'flex';
+            document.getElementById('newBatchName').focus();
+        }
+
+        function confirmCreateBatch() {
+            const name = document.getElementById('newBatchName').value;
             if (name) {
                 currentBatch = name;
                 renderSidebar();
                 renderBoard(name);
+                document.getElementById('batchModalOverlay').style.display = 'none';
             }
         }
 
         async function deleteBatch() {
             if (!currentBatch) return;
-            if (confirm(`Are you sure you want to DELETE Batch: "${currentBatch}" and ALL its systems?`)) {
-                // Call backend to delete
+            if (confirm(`DELETE "${currentBatch}" and all files inside it? This cannot be undone.`)) {
                 await fetch(`/batches/${currentBatch}`, { method: 'DELETE' });
                 currentBatch = null;
                 await loadData();
@@ -544,99 +638,108 @@
             }
         }
 
+        // --- RENDER BOARD ---
         function renderBoard(batchName) {
             document.getElementById('headerTitle').innerText = batchName;
             document.getElementById('kanbanBoard').style.display = 'flex';
             document.getElementById('headerActions').style.display = 'flex';
             document.getElementById('emptyState').style.display = 'none';
 
-            // Clear Columns
-            ['in-progress', 'revision', 'completed', 'rejected'].forEach(status => {
-                document.getElementById(`col-${status}`).innerHTML = '';
-                document.getElementById(`count-${status}`).innerText = '0';
+            // Reset Columns
+            ['backlog', 'in-progress', 'revision', 'completed'].forEach(s => {
+                const container = document.getElementById(`col-${s}`);
+                if (container) container.innerHTML = '';
+                const counter = document.getElementById(`c-${s}`);
+                if (counter) counter.innerText = '0';
             });
 
             const systems = allData.filter(s => s.batch_number === batchName);
             document.getElementById('headerCount').innerText = `${systems.length} Systems`;
 
             systems.forEach(sys => {
-                const colId = `col-${sys.completion_status}`;
-                const container = document.getElementById(colId);
+                let status = sys.completion_status;
+                if (status === 'rejected') status = 'backlog';
 
-                // Update Count
-                const countSpan = document.getElementById(`count-${sys.completion_status}`);
-                countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                const container = document.getElementById(`col-${status}`);
+                const counter = document.getElementById(`c-${status}`);
 
                 if (container) {
+                    counter.innerText = parseInt(counter.innerText) + 1;
+
                     const card = document.createElement('div');
                     card.className = `card ${sys.is_active_work ? 'active-work' : ''}`;
 
                     let layersHtml = '';
                     (sys.layers_data || []).forEach(l => {
-                        layersHtml += `<div class="layer-row-s"><span>${l.name}</span><span>${l.size}</span></div>`;
+                        layersHtml += `<span class="layer-chip">${l.name}: ${l.size}</span>`;
                     });
 
-                    const activeLabel = sys.is_active_work ? '<span class="active-label">WORKING ON THIS</span><br>' : '';
+                    const activeDot = sys.is_active_work ? '<div class="active-dot" title="Working Now"></div>' : '';
 
                     card.innerHTML = `
-                        ${activeLabel}
+                        ${activeDot}
                         <div class="card-title">${sys.system_name}</div>
                         <div class="card-meta">
                             <span class="rev-badge">${sys.revision_status}</span>
-                            <span>${new Date(sys.created_at).toLocaleDateString()}</span>
+                            <span>${new Date(sys.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                         </div>
-                        <div class="card-layers">${layersHtml || 'No details'}</div>
+                        <div class="layers-preview">${layersHtml || '<span style="font-size:0.7rem; color:#eee;">-</span>'}</div>
                     `;
-                    card.onclick = () => openModal(sys);
+                    card.onclick = () => openSystemModal(sys);
                     container.appendChild(card);
                 }
             });
         }
 
-        // --- MODAL LOGIC ---
-        function openModal(sys = null) {
-            document.getElementById('modalOverlay').style.display = 'flex';
+        // --- SYSTEM MODAL ---
+        function openSystemModal(sys = null) {
+            document.getElementById('sysModalOverlay').style.display = 'flex';
             document.getElementById('layerContainer').innerHTML = '';
 
             if (sys) {
-                document.getElementById('modalTitle').innerText = "Edit System";
+                // Edit
+                document.getElementById('sysModalTitle').innerText = "Edit System";
                 document.getElementById('sysId').value = sys.id;
                 document.getElementById('sysName').value = sys.system_name;
                 document.getElementById('sysRev').value = sys.revision_status;
-                document.getElementById('sysStatus').value = sys.completion_status;
-                document.getElementById('sysActive').checked = sys.is_active_work;
-                document.getElementById('btnDeleteSys').classList.remove('hidden');
 
+                let status = sys.completion_status;
+                if (status === 'rejected') status = 'backlog';
+                document.getElementById('sysStatus').value = status;
+
+                document.getElementById('sysActive').checked = sys.is_active_work;
+                document.getElementById('btnDeleteSys').style.visibility = 'visible';
                 (sys.layers_data || []).forEach(l => addLayerInput(l.name, l.size));
             } else {
-                document.getElementById('modalTitle').innerText = "Add New System";
+                // Add
+                document.getElementById('sysModalTitle').innerText = "New System";
                 document.getElementById('sysId').value = '';
                 document.getElementById('sysName').value = '';
                 document.getElementById('sysRev').value = 'v1.0';
-                document.getElementById('sysStatus').value = 'in-progress';
+                document.getElementById('sysStatus').value = 'backlog';
                 document.getElementById('sysActive').checked = false;
-                document.getElementById('btnDeleteSys').classList.add('hidden');
+                document.getElementById('btnDeleteSys').style.visibility = 'hidden';
                 addLayerInput();
             }
         }
 
         function addLayerInput(name = '', size = '') {
             const div = document.createElement('div');
-            div.className = 'layer-input-group';
+            div.className = 'layer-row';
             div.innerHTML = `
                 <input type="text" class="form-input" placeholder="Layer" value="${name}" style="flex:2">
                 <input type="text" class="form-input" placeholder="Size" value="${size}" style="flex:1">
-                <button type="button" onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer;">&times;</button>
+                <button type="button" onclick="this.parentElement.remove()" style="border:none; background:transparent; color:#ef4444; cursor:pointer; font-size:1.2rem;">&times;</button>
             `;
             document.getElementById('layerContainer').appendChild(div);
         }
 
         async function saveSystem() {
-            if (!currentBatch) return alert("No batch selected!");
+            if (!currentBatch) return alert("Error: No batch selected");
 
             const id = document.getElementById('sysId').value;
             const data = {
-                batch_number: currentBatch, // AUTOMATICALLY SET
+                batch_number: currentBatch,
                 system_name: document.getElementById('sysName').value,
                 revision_status: document.getElementById('sysRev').value,
                 completion_status: document.getElementById('sysStatus').value,
@@ -644,12 +747,12 @@
                 layers_data: []
             };
 
-            document.querySelectorAll('.layer-input-group').forEach(row => {
+            document.querySelectorAll('.layer-row').forEach(row => {
                 const inputs = row.querySelectorAll('input');
                 if (inputs[0].value) data.layers_data.push({ name: inputs[0].value, size: inputs[1].value });
             });
 
-            if (!data.system_name) return alert("System Name Required");
+            if (!data.system_name) return alert("Please enter a System Name");
 
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/${id}` : API_URL;
@@ -660,19 +763,20 @@
                 body: JSON.stringify(data)
             });
 
-            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('sysModalOverlay').style.display = 'none';
             loadData();
         }
 
         async function deleteSystem() {
             const id = document.getElementById('sysId').value;
-            if (confirm("Delete this single system?")) {
+            if (confirm("Delete this system permanently?")) {
                 await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                document.getElementById('modalOverlay').style.display = 'none';
+                document.getElementById('sysModalOverlay').style.display = 'none';
                 loadData();
             }
         }
 
+        // Start
         loadData();
     </script>
 </body>
