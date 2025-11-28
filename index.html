@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D System Tracker</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-color);
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        /* Status Colors */
+        .status-completed {
+            border-left: 8px solid #2ecc71;
+            background-color: #eafaf1;
+        }
+
+        /* Green */
+        .status-rejected {
+            border-left: 8px solid #e74c3c;
+            background-color: #fdedec;
+        }
+
+        /* Red */
+        .status-in-progress {
+            border-left: 8px solid #00bcd4;
+            background-color: #e0f7fa;
+        }
+
+        /* Cyan */
+        .status-revision {
+            border-left: 8px solid #f1c40f;
+            background-color: #fef9e7;
+        }
+
+        /* Yellow */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Form Styling */
+        .editor-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        /* Dynamic Layers Table */
+        .layer-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+
+        .layer-row input {
+            flex: 1;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-action {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-action:hover {
+            background: #555;
+        }
+
+        .btn-add-layer {
+            background: #2980b9;
+            margin-top: 10px;
+        }
+
+        /* Dashboard Grid */
+        .system-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .system-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .active-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: white;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 10px;
+        }
+
+        .card-header {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .card-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .layer-list {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        .layer-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .card-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background: #f39c12;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>System Organizer</h1>
+
+        <div class="editor-panel">
+            <h3 id="formTitle">Add New System</h3>
+            <input type="hidden" id="systemId">
+            <div class="form-row">
+                <input type="text" id="sysName" placeholder="System Name (e.g. Engine Block)">
+                <input type="text" id="sysBatch" placeholder="Batch Number">
+                <input type="text" id="sysRev" placeholder="Revision Status">
+            </div>
+
+            <div class="form-row">
+                <select id="sysStatus">
+                    <option value="in-progress">In Progress (Cyan)</option>
+                    <option value="completed">Completed (Green)</option>
+                    <option value="rejected">Rejected (Red)</option>
+                    <option value="revision">In Revision (Yellow)</option>
+                </select>
+                <label style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="sysActive" style="flex:none;"> Currently Working On This?
+                </label>
+            </div>
+
+            <h4>Layers & Sizes (Mils)</h4>
+            <div id="layerContainer">
+            </div>
+            <button class="btn-action btn-add-layer" onclick="addLayerRow()">+ Add Layer Row</button>
+
+            <hr>
+            <button class="btn-action" onclick="saveSystem()">SAVE SYSTEM</button>
+            <button class="btn-action" style="background:#999" onclick="resetForm()">CANCEL</button>
+        </div>
+
+        <div class="system-grid" id="displayGrid">
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/systems';
+
+        // 1. Fetch and Display Data
+        async function loadSystems() {
+            const res = await fetch(API_URL);
+            const systems = await res.json();
+            const grid = document.getElementById('displayGrid');
+            grid.innerHTML = '';
+
+            systems.forEach(sys => {
+                const date = new Date(sys.created_at).toLocaleDateString();
+
+                // Generate Layers HTML
+                let layersHtml = '';
+                const layers = sys.layers_data || [];
+                layers.forEach(l => {
+                    layersHtml += `<div class="layer-item"><span>${l.name}</span> <span>${l.size} mils</span></div>`;
+                });
+
+                // Determine Status Class
+                let statusClass = 'status-in-progress';
+                if (sys.completion_status === 'completed') statusClass = 'status-completed';
+                if (sys.completion_status === 'rejected') statusClass = 'status-rejected';
+                if (sys.completion_status === 'revision') statusClass = 'status-revision';
+
+                const activeBadge = sys.is_active_work ? '<div class="active-badge">CURRENTLY WORKING</div>' : '';
+
+                const html = `
+                <div class="system-card ${statusClass}">
+                    ${activeBadge}
+                    <div class="card-header">${sys.system_name}</div>
+                    <div class="card-meta">
+                        Batch: ${sys.batch_number} | Rev: ${sys.revision_status}<br>
+                        Date: ${date}
+                    </div>
+                    <div class="layer-list">
+                        <strong>Layers:</strong>
+                        ${layersHtml}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-action btn-edit" onclick='editSystem(${JSON.stringify(sys)})'>Edit</button>
+                        <button class="btn-action btn-small" onclick="deleteSystem(${sys.id})">Delete</button>
+                    </div>
+                </div>
+            `;
+                grid.innerHTML += html;
+            });
+        }
+
+        // 2. Dynamic Layer Rows Logic
+        function addLayerRow(name = '', size = '') {
+            const div = document.createElement('div');
+            div.className = 'layer-row';
+            div.innerHTML = `
+            <input type="text" placeholder="Layer Name" class="layer-name" value="${name}">
+            <input type="text" placeholder="Size (mils)" class="layer-size" value="${size}">
+            <button class="btn-small" onclick="this.parentElement.remove()">X</button>
+        `;
+            document.getElementById('layerContainer').appendChild(div);
+        }
+
+        // 3. Save (Create or Update)
+        async function saveSystem() {
+            // Collect basic data
+            const id = document.getElementById('systemId').value;
+            const data = {
+                system_name: document.getElementById('sysName').value,
+                batch_number: document.getElementById('sysBatch').value,
+                revision_status: document.getElementById('sysRev').value,
+                completion_status: document.getElementById('sysStatus').value,
+                is_active_work: document.getElementById('sysActive').checked,
+                layers_data: []
+            };
+
+            // Collect Layers
+            document.querySelectorAll('.layer-row').forEach(row => {
+                const name = row.querySelector('.layer-name').value;
+                const size = row.querySelector('.layer-size').value;
+                if (name && size) data.layers_data.push({ name, size });
+            });
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_URL}/${id}` : API_URL;
+
+            await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            resetForm();
+            loadSystems();
+        }
+
+        // 4. Edit Logic
+        function editSystem(sys) {
+            window.scrollTo(0, 0);
+            document.getElementById('formTitle').innerText = "Edit System";
+            document.getElementById('systemId').value = sys.id;
+            document.getElementById('sysName').value = sys.system_name;
+            document.getElementById('sysBatch').value = sys.batch_number;
+            document.getElementById('sysRev').value = sys.revision_status;
+            document.getElementById('sysStatus').value = sys.completion_status;
+            document.getElementById('sysActive').checked = sys.is_active_work;
+
+            // Clear and refill layers
+            const container = document.getElementById('layerContainer');
+            container.innerHTML = '';
+            if (sys.layers_data) {
+                sys.layers_data.forEach(l => addLayerRow(l.name, l.size));
+            }
+        }
+
+        // 5. Delete Logic
+        async function deleteSystem(id) {
+            if (confirm('Are you sure you want to delete this system?')) {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                loadSystems();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('systemId').value = '';
+            document.getElementById('formTitle').innerText = "Add New System";
+            document.getElementById('sysName').value = '';
+            document.getElementById('sysBatch').value = '';
+            document.getElementById('sysRev').value = '';
+            document.getElementById('sysActive').checked = false;
+            document.getElementById('layerContainer').innerHTML = '';
+            addLayerRow(); // Add one empty row
+        }
+
+        // Initial Load
+        addLayerRow();
+        loadSystems();
+    </script>
+
+</body>
+
+</html>
