@@ -87,6 +87,19 @@ app.delete('/systems/:id', async (req, res) => {
     }
 });
 
+// 5. DELETE ENTIRE BATCH (New Feature)
+app.delete('/batches/:batch_name', async (req, res) => {
+    const { batch_name } = req.params;
+    try {
+        // Deletes ALL systems that share this batch number
+        await pool.query('DELETE FROM systems WHERE batch_number = $1', [batch_name]);
+        res.json({ message: "Batch Deleted" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
 app.listen(port, () => {
     console.log(`App running on http://localhost:${port}`);
 });
