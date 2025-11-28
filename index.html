@@ -8,13 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --bg-sidebar: #0f172a;
-            --primary: #6366f1;
+            --primary: #4f46e5;
             --text-main: #334155;
             --text-light: #94a3b8;
 
-            /* Status Accents */
+            /* Status Colors */
             --c-backlog: #64748b;
             --c-progress: #3b82f6;
             --c-revision: #f59e0b;
@@ -170,7 +170,7 @@
         }
 
         .btn-primary:hover {
-            background: #4f46e5;
+            background: #4338ca;
         }
 
         .btn-danger {
@@ -183,30 +183,35 @@
             color: white;
         }
 
-        /* --- QUICK NAV (JUMP LINKS) --- */
+        /* --- QUICK NAV (Distributed) --- */
         .quick-nav {
-            padding: 10px 40px;
+            padding: 0 40px;
             background: white;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            /* Evenly distributed */
+            align-items: center;
         }
 
         .nav-link {
-            font-size: 0.85rem;
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #64748b;
             cursor: pointer;
-            padding-bottom: 2px;
-            border-bottom: 2px solid transparent;
+            border-bottom: 3px solid transparent;
             transition: 0.2s;
         }
 
         .nav-link:hover {
             color: var(--primary);
+            background: #f8fafc;
         }
 
-        /* --- SCROLLABLE CONTENT --- */
+        /* --- CONTENT --- */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -215,7 +220,7 @@
         }
 
         .section-block {
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .section-header {
@@ -242,7 +247,7 @@
             font-weight: 700;
         }
 
-        /* Section Colors */
+        /* Section Specific Colors */
         .sec-backlog .section-header {
             border-color: var(--c-backlog);
             color: var(--c-backlog);
@@ -263,87 +268,116 @@
             color: var(--c-completed);
         }
 
-        /* --- SYSTEM ROWS --- */
+        /* --- DATA GRID ROWS (New Layout) --- */
+        /* Columns: Name (1.5) | Layers (3) | Total Size (0.8) | Rev (0.5) | Status (1.2) | Edit (0.5) */
         .system-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr 0.5fr;
+            grid-template-columns: 1.5fr 3fr 0.8fr 0.5fr 1.2fr 0.5fr;
+            gap: 15px;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
             align-items: center;
             transition: 0.2s;
             position: relative;
         }
 
         .system-row:hover {
-            transform: translateX(2px);
             border-color: var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
         }
 
         .system-row.active-work {
-            border-left: 4px solid #0f172a;
-            background: #f8fafc;
+            border-left: 5px solid #0f172a;
+            background: #fff;
         }
 
-        /* Columns inside Row */
         .col-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #1e293b;
             font-size: 0.95rem;
         }
 
-        .col-rev {
-            font-size: 0.85rem;
-            color: #64748b;
-            font-family: monospace;
+        /* Layers Chips */
+        .col-layers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .layer-chip {
+            font-size: 0.75rem;
             background: #f1f5f9;
-            padding: 2px 6px;
+            color: #475569;
+            padding: 3px 8px;
             border-radius: 4px;
-            width: fit-content;
+            border: 1px solid #e2e8f0;
+            font-family: monospace;
+        }
+
+        .layer-chip b {
+            color: #0f172a;
         }
 
         .col-size {
-            font-weight: 600;
+            font-weight: 700;
             color: #334155;
             font-size: 0.9rem;
+            text-align: center;
         }
 
         .col-size small {
             font-weight: 400;
             color: #94a3b8;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            display: block;
         }
 
-        /* Quick Status Dropdown */
-        .status-select {
-            padding: 6px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
+        .col-rev {
             font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+            text-align: center;
+            background: #f8fafc;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Dropdown */
+        .status-select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             outline: none;
             background: white;
             width: 100%;
+            color: #334155;
         }
 
         .status-select:focus {
             border-color: var(--primary);
         }
 
-        .btn-icon {
+        /* Edit Button (Text) */
+        .btn-edit-text {
             background: none;
             border: none;
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            color: #94a3b8;
-            font-size: 1.1rem;
-            padding: 5px;
+            text-decoration: underline;
+            text-align: right;
         }
 
-        .btn-icon:hover {
+        .btn-edit-text:hover {
             color: var(--primary);
         }
 
@@ -364,7 +398,7 @@
 
         .modal {
             background: white;
-            width: 450px;
+            width: 480px;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
@@ -398,7 +432,7 @@
         }
 
         .layer-area {
-            max-height: 150px;
+            max-height: 180px;
             overflow-y: auto;
             border: 1px solid #f1f5f9;
             padding: 10px;
@@ -420,17 +454,10 @@
             margin-top: 25px;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             margin-top: 80px;
             color: #94a3b8;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #cbd5e1;
         }
     </style>
 </head>
@@ -444,7 +471,7 @@
 
         <div style="margin-top:auto;">
             <button class="btn-sidebar" onclick="openBatchModal()">+ Create New Batch</button>
-            <button class="btn-sidebar" onclick="exportToCSV()">📥 Export CSV</button>
+            <button class="btn-sidebar" onclick="exportToCSV()">Export CSV</button>
         </div>
     </div>
 
@@ -468,36 +495,24 @@
         </div>
 
         <div class="content-area" id="contentArea" style="display:none;">
-
             <div class="section-block sec-backlog" id="sec-backlog">
-                <div class="section-header">
-                    <span class="section-title">Backlog</span>
-                    <span class="section-count" id="count-backlog">0</span>
-                </div>
+                <div class="section-header"><span class="section-title">Backlog</span><span class="section-count"
+                        id="count-backlog">0</span></div>
                 <div id="list-backlog"></div>
             </div>
-
             <div class="section-block sec-progress" id="sec-progress">
-                <div class="section-header">
-                    <span class="section-title">In Progress</span>
-                    <span class="section-count" id="count-progress">0</span>
-                </div>
+                <div class="section-header"><span class="section-title">In Progress</span><span class="section-count"
+                        id="count-progress">0</span></div>
                 <div id="list-progress"></div>
             </div>
-
             <div class="section-block sec-revision" id="sec-revision">
-                <div class="section-header">
-                    <span class="section-title">In Revision</span>
-                    <span class="section-count" id="count-revision">0</span>
-                </div>
+                <div class="section-header"><span class="section-title">In Revision</span><span class="section-count"
+                        id="count-revision">0</span></div>
                 <div id="list-revision"></div>
             </div>
-
             <div class="section-block sec-completed" id="sec-completed">
-                <div class="section-header">
-                    <span class="section-title">Completed</span>
-                    <span class="section-count" id="count-completed">0</span>
-                </div>
+                <div class="section-header"><span class="section-title">Completed</span><span class="section-count"
+                        id="count-completed">0</span></div>
                 <div id="list-completed"></div>
             </div>
         </div>
@@ -525,8 +540,8 @@
     <div class="modal-overlay" id="deleteBatchModal">
         <div class="modal">
             <h3 class="modal-title" style="color:#ef4444">Delete Batch?</h3>
-            <p style="color:#64748b; margin-bottom:20px;">Are you sure you want to delete <strong
-                    id="delBatchName"></strong>? <br>This will permanently delete all systems inside it.</p>
+            <p style="color:#64748b; margin-bottom:20px;">Permanently delete <strong id="delBatchName"></strong> and all
+                its systems?</p>
             <div class="modal-footer">
                 <button class="btn" style="border:1px solid #ddd"
                     onclick="closeModal('deleteBatchModal')">Cancel</button>
@@ -539,22 +554,16 @@
         <div class="modal">
             <div style="display:flex; justify-content:space-between;">
                 <h3 class="modal-title" id="sysModalTitle">Add System</h3>
-                <button id="btnDeleteSys" class="btn-icon" style="color:#ef4444" onclick="deleteSystem()">🗑️</button>
+                <button id="btnDeleteSys" class="btn-edit-text" style="color:#ef4444" onclick="deleteSystem()">Delete
+                    System</button>
             </div>
             <input type="hidden" id="sysId">
-
-            <div class="form-group">
-                <label class="form-label">System Name</label>
-                <input type="text" class="form-input" id="sysName">
-            </div>
-
+            <div class="form-group"><label class="form-label">System Name</label><input type="text" class="form-input"
+                    id="sysName"></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="form-group">
-                    <label class="form-label">Revision</label>
-                    <input type="text" class="form-input" id="sysRev" placeholder="v1.0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
+                <div class="form-group"><label class="form-label">Revision</label><input type="text" class="form-input"
+                        id="sysRev" placeholder="v1.0"></div>
+                <div class="form-group"><label class="form-label">Status</label>
                     <select class="form-input" id="sysStatus">
                         <option value="backlog">Backlog</option>
                         <option value="in-progress">In Progress</option>
@@ -563,21 +572,17 @@
                     </select>
                 </div>
             </div>
-
             <div class="form-group">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
-                    <input type="checkbox" id="sysActive"> <span style="font-weight:600; font-size:0.9rem;">Mark as
-                        Active Work</span>
-                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer"><input type="checkbox"
+                        id="sysActive"> <span style="font-weight:600; font-size:0.9rem;">Mark as Active
+                        Work</span></label>
             </div>
-
             <div class="form-group">
                 <label class="form-label">Layers & Sizes (Mils)</label>
                 <div class="layer-area" id="layerContainer"></div>
                 <button class="btn" style="width:100%; border:1px dashed #cbd5e1; color:#64748b"
                     onclick="addLayerInput()">+ Add Layer</button>
             </div>
-
             <div class="modal-footer">
                 <button class="btn" style="border:1px solid #ddd" onclick="closeModal('sysModal')">Cancel</button>
                 <button class="btn btn-primary" onclick="saveSystem()">Save System</button>
@@ -590,7 +595,6 @@
         let allData = [];
         let currentBatch = null;
 
-        // --- DATA LOADING ---
         async function loadData() {
             try {
                 const res = await fetch(API_URL);
@@ -600,7 +604,34 @@
             } catch (e) { console.error(e); }
         }
 
-        // --- SIDEBAR ---
+        // --- EXPORT FUNCTION (Fixed) ---
+        function exportToCSV() {
+            if (!allData.length) return alert("No Data");
+
+            // CSV Header with BOM for Excel
+            let csvContent = "\uFEFFBatch,System,Revision,Status,Total Mils,Layers Details\n";
+
+            allData.forEach(s => {
+                let size = 0;
+                let layersArr = (s.layers_data || []).map(l => {
+                    size += parseFloat(l.size) || 0;
+                    return `${l.name} (${l.size})`;
+                });
+
+                // Quote string to prevent commas breaking CSV
+                const layersStr = `"${layersArr.join(' | ')}"`;
+                const systemName = `"${s.system_name}"`;
+
+                csvContent += `${s.batch_number},${systemName},${s.revision_status},${s.completion_status},${size},${layersStr}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `3D_Report_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+        }
+
         function renderSidebar() {
             const list = document.getElementById('batchList');
             list.innerHTML = '';
@@ -616,7 +647,6 @@
             });
         }
 
-        // --- MAIN CONTENT RENDER ---
         function renderContent(batchName) {
             document.getElementById('headerTitle').innerText = batchName;
             document.getElementById('headerActions').style.display = 'flex';
@@ -624,7 +654,6 @@
             document.getElementById('contentArea').style.display = 'block';
             document.getElementById('emptyState').style.display = 'none';
 
-            // Clear Lists
             ['backlog', 'progress', 'revision', 'completed'].forEach(s => {
                 document.getElementById(`list-${s}`).innerHTML = '';
                 document.getElementById(`count-${s}`).innerText = '0';
@@ -634,10 +663,9 @@
             document.getElementById('headerCount').innerText = `${systems.length} Systems`;
 
             systems.forEach(sys => {
-                // Map status
                 let status = sys.completion_status;
                 if (status === 'rejected') status = 'backlog';
-                if (status === 'in-progress') status = 'progress'; // Fix naming mismatch
+                if (status === 'in-progress') status = 'progress';
 
                 const container = document.getElementById(`list-${status}`);
                 const counter = document.getElementById(`count-${status}`);
@@ -645,19 +673,21 @@
                 if (container) {
                     counter.innerText = parseInt(counter.innerText) + 1;
 
-                    // Auto Calculate Size
                     let totalSize = 0;
+                    let layersHtml = '';
                     (sys.layers_data || []).forEach(l => {
                         totalSize += parseFloat(l.size) || 0;
+                        layersHtml += `<span class="layer-chip"><b>${l.name}</b>:${l.size}</span>`;
                     });
 
                     const row = document.createElement('div');
                     row.className = `system-row ${sys.is_active_work ? 'active-work' : ''}`;
                     row.innerHTML = `
                         <div class="col-name">${sys.system_name} ${sys.is_active_work ? '🔥' : ''}</div>
+                        <div class="col-layers">${layersHtml || '<span style="color:#cbd5e1">-</span>'}</div>
+                        <div class="col-size">${totalSize} <small>Total Mils</small></div>
                         <div class="col-rev">${sys.revision_status}</div>
-                        <div class="col-size">${totalSize} <small>mils</small></div>
-                        <div style="padding-right:10px;">
+                        <div>
                             <select class="status-select" onchange="quickUpdateStatus(${sys.id}, this.value)">
                                 <option value="backlog" ${status === 'backlog' ? 'selected' : ''}>Backlog</option>
                                 <option value="in-progress" ${status === 'progress' ? 'selected' : ''}>In Progress</option>
@@ -666,7 +696,7 @@
                             </select>
                         </div>
                         <div style="text-align:right;">
-                            <button class="btn-icon" onclick='openSystemModal(${JSON.stringify(sys)})'>✏️</button>
+                            <button class="btn-edit-text" onclick='openSystemModal(${JSON.stringify(sys)})'>Edit</button>
                         </div>
                     `;
                     container.appendChild(row);
@@ -674,43 +704,21 @@
             });
         }
 
-        // --- STATUS UPDATE (DIRECT) ---
         async function quickUpdateStatus(id, newStatus) {
-            // Find system in memory to get other data
             const sys = allData.find(s => s.id == id);
             if (!sys) return;
-
-            // Prepare Update
-            const updatedData = {
-                ...sys,
-                completion_status: newStatus
-            };
-
-            // Send to Server
+            const updatedData = { ...sys, completion_status: newStatus };
             await fetch(`${API_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData)
             });
-
-            // Reload
             loadData();
         }
 
-        // --- MODAL FUNCTIONS ---
-        function openBatchModal() {
-            document.getElementById('newBatchName').value = '';
-            document.getElementById('batchModal').style.display = 'flex';
-        }
-
-        function openDeleteBatchModal() {
-            document.getElementById('delBatchName').innerText = currentBatch;
-            document.getElementById('deleteBatchModal').style.display = 'flex';
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
+        function openBatchModal() { document.getElementById('newBatchName').value = ''; document.getElementById('batchModal').style.display = 'flex'; }
+        function openDeleteBatchModal() { document.getElementById('delBatchName').innerText = currentBatch; document.getElementById('deleteBatchModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         async function confirmCreateBatch() {
             const name = document.getElementById('newBatchName').value;
@@ -739,24 +747,18 @@
         function openSystemModal(sys = null) {
             document.getElementById('sysModal').style.display = 'flex';
             document.getElementById('layerContainer').innerHTML = '';
-
             if (sys) {
-                // Edit
                 document.getElementById('sysModalTitle').innerText = "Edit System";
                 document.getElementById('sysId').value = sys.id;
                 document.getElementById('sysName').value = sys.system_name;
                 document.getElementById('sysRev').value = sys.revision_status;
-
                 let s = sys.completion_status;
                 if (s === 'rejected') s = 'backlog';
                 document.getElementById('sysStatus').value = s;
-
                 document.getElementById('sysActive').checked = sys.is_active_work;
                 document.getElementById('btnDeleteSys').style.display = 'block';
-
                 (sys.layers_data || []).forEach(l => addLayerInput(l.name, l.size));
             } else {
-                // New
                 document.getElementById('sysModalTitle').innerText = "Add New System";
                 document.getElementById('sysId').value = '';
                 document.getElementById('sysName').value = '';
@@ -782,7 +784,6 @@
         async function saveSystem() {
             if (!currentBatch) return alert("Select a batch first");
             const id = document.getElementById('sysId').value;
-
             const data = {
                 batch_number: currentBatch,
                 system_name: document.getElementById('sysName').value,
@@ -791,23 +792,14 @@
                 is_active_work: document.getElementById('sysActive').checked,
                 layers_data: []
             };
-
             document.querySelectorAll('.layer-row-input').forEach(row => {
                 const inputs = row.querySelectorAll('input');
                 if (inputs[0].value) data.layers_data.push({ name: inputs[0].value, size: inputs[1].value });
             });
-
             if (!data.system_name) return alert("Name required");
-
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/${id}` : API_URL;
-
-            await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
+            await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             closeModal('sysModal');
             loadData();
         }
@@ -821,29 +813,7 @@
             }
         }
 
-        function scrollToSection(id) {
-            document.getElementById(`sec-${id}`).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function exportToCSV() {
-            if (!allData.length) return alert("No Data");
-            const headers = ['Batch', 'System', 'Rev', 'Status', 'Total Size', 'Layers'];
-            const rows = allData.map(s => {
-                let size = 0;
-                let layers = (s.layers_data || []).map(l => {
-                    size += parseFloat(l.size) || 0;
-                    return `${l.name}:${l.size}`;
-                }).join(' | ');
-
-                return [s.batch_number, s.system_name, s.revision_status, s.completion_status, size, layers].join(',');
-            });
-
-            const blob = new Blob([[headers.join(',')], ...rows].join('\n'), { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = '3D_Tracker_Export.csv';
-            link.click();
-        }
+        function scrollToSection(id) { document.getElementById(`sec-${id}`).scrollIntoView({ behavior: 'smooth' }); }
 
         loadData();
     </script>
