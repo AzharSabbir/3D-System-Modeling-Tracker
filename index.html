@@ -183,14 +183,13 @@
             color: white;
         }
 
-        /* --- QUICK NAV (Distributed) --- */
+        /* --- QUICK NAV --- */
         .quick-nav {
             padding: 0 40px;
             background: white;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
-            /* Evenly distributed */
             align-items: center;
         }
 
@@ -247,7 +246,6 @@
             font-weight: 700;
         }
 
-        /* Section Specific Colors */
         .sec-backlog .section-header {
             border-color: var(--c-backlog);
             color: var(--c-backlog);
@@ -268,86 +266,91 @@
             color: var(--c-completed);
         }
 
-        /* --- DATA GRID ROWS (New Layout) --- */
-        /* Columns: Name (1.5) | Layers (3) | Total Size (0.8) | Rev (0.5) | Status (1.2) | Edit (0.5) */
+        /* --- SYSTEM ROW LAYOUT (V6) --- */
+        /* Columns: Name (1.5) | Layers List (4) | Rev (0.5) | Status (1) | Edit (0.5) */
         .system-row {
             display: grid;
-            grid-template-columns: 1.5fr 3fr 0.8fr 0.5fr 1.2fr 0.5fr;
-            gap: 15px;
+            grid-template-columns: 1.5fr 4fr 0.5fr 1.2fr 0.5fr;
+            gap: 20px;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            align-items: center;
-            transition: 0.2s;
+            padding: 20px;
+            margin-bottom: 15px;
+            align-items: start;
+            /* Align to top */
             position: relative;
+            transition: 0.2s;
         }
 
         .system-row:hover {
             border-color: var(--primary);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transform: translateY(-1px);
         }
 
         .system-row.active-work {
-            border-left: 5px solid #0f172a;
+            border-left: 6px solid #0f172a;
             background: #fff;
         }
 
         .col-name {
             font-weight: 700;
             color: #1e293b;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            margin-top: 5px;
         }
 
-        /* Layers Chips */
+        /* Aligned with first layer */
+
+        /* New Layers Design */
         .col-layers {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            flex-direction: column;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 6px;
+            overflow: hidden;
         }
 
-        .layer-chip {
-            font-size: 0.75rem;
-            background: #f1f5f9;
-            color: #475569;
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            font-family: monospace;
-        }
-
-        .layer-chip b {
-            color: #0f172a;
-        }
-
-        .col-size {
-            font-weight: 700;
-            color: #334155;
+        .layer-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
             font-size: 0.9rem;
-            text-align: center;
         }
 
-        .col-size small {
-            font-weight: 400;
-            color: #94a3b8;
-            font-size: 0.7rem;
-            display: block;
+        .layer-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .layer-detail-row:hover {
+            background: #f1f5f9;
+        }
+
+        .lname {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .lsize {
+            font-family: monospace;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .col-rev {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #64748b;
             font-weight: 600;
             text-align: center;
-            background: #f8fafc;
+            margin-top: 5px;
+            background: #f1f5f9;
             padding: 4px;
             border-radius: 4px;
-            border: 1px solid #f1f5f9;
+            border: 1px solid #e2e8f0;
         }
 
-        /* Dropdown */
         .status-select {
             padding: 8px;
             border-radius: 6px;
@@ -359,13 +362,13 @@
             background: white;
             width: 100%;
             color: #334155;
+            margin-top: 2px;
         }
 
         .status-select:focus {
             border-color: var(--primary);
         }
 
-        /* Edit Button (Text) */
         .btn-edit-text {
             background: none;
             border: none;
@@ -375,6 +378,7 @@
             cursor: pointer;
             text-decoration: underline;
             text-align: right;
+            margin-top: 8px;
         }
 
         .btn-edit-text:hover {
@@ -468,7 +472,6 @@
         <div class="brand">Azhar 3D <span>Tracker</span></div>
         <div class="sidebar-label">Projects / Batches</div>
         <ul class="batch-list" id="batchList"></ul>
-
         <div style="margin-top:auto;">
             <button class="btn-sidebar" onclick="openBatchModal()">+ Create New Batch</button>
             <button class="btn-sidebar" onclick="exportToCSV()">Export CSV</button>
@@ -526,27 +529,21 @@
     <div class="modal-overlay" id="batchModal">
         <div class="modal">
             <h3 class="modal-title">Create New Batch</h3>
-            <div class="form-group">
-                <label class="form-label">Batch Name</label>
-                <input type="text" class="form-input" id="newBatchName" placeholder="e.g. Order #700">
-            </div>
-            <div class="modal-footer">
-                <button class="btn" style="border:1px solid #ddd" onclick="closeModal('batchModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmCreateBatch()">Create</button>
-            </div>
+            <div class="form-group"><label class="form-label">Batch Name</label><input type="text" class="form-input"
+                    id="newBatchName"></div>
+            <div class="modal-footer"><button class="btn" style="border:1px solid #ddd"
+                    onclick="closeModal('batchModal')">Cancel</button><button class="btn btn-primary"
+                    onclick="confirmCreateBatch()">Create</button></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="deleteBatchModal">
         <div class="modal">
             <h3 class="modal-title" style="color:#ef4444">Delete Batch?</h3>
-            <p style="color:#64748b; margin-bottom:20px;">Permanently delete <strong id="delBatchName"></strong> and all
-                its systems?</p>
-            <div class="modal-footer">
-                <button class="btn" style="border:1px solid #ddd"
-                    onclick="closeModal('deleteBatchModal')">Cancel</button>
-                <button class="btn btn-danger" onclick="confirmDeleteBatch()">Yes, Delete All</button>
-            </div>
+            <p style="color:#64748b;">Permanently delete <strong id="delBatchName"></strong>?</p>
+            <div class="modal-footer"><button class="btn" style="border:1px solid #ddd"
+                    onclick="closeModal('deleteBatchModal')">Cancel</button><button class="btn btn-danger"
+                    onclick="confirmDeleteBatch()">Yes, Delete All</button></div>
         </div>
     </div>
 
@@ -572,21 +569,18 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer"><input type="checkbox"
-                        id="sysActive"> <span style="font-weight:600; font-size:0.9rem;">Mark as Active
-                        Work</span></label>
-            </div>
+            <div class="form-group"><label style="display:flex; align-items:center; gap:8px; cursor:pointer"><input
+                        type="checkbox" id="sysActive"> <span style="font-weight:600; font-size:0.9rem;">Mark as Active
+                        Work</span></label></div>
             <div class="form-group">
                 <label class="form-label">Layers & Sizes (Mils)</label>
                 <div class="layer-area" id="layerContainer"></div>
                 <button class="btn" style="width:100%; border:1px dashed #cbd5e1; color:#64748b"
                     onclick="addLayerInput()">+ Add Layer</button>
             </div>
-            <div class="modal-footer">
-                <button class="btn" style="border:1px solid #ddd" onclick="closeModal('sysModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="saveSystem()">Save System</button>
-            </div>
+            <div class="modal-footer"><button class="btn" style="border:1px solid #ddd"
+                    onclick="closeModal('sysModal')">Cancel</button><button class="btn btn-primary"
+                    onclick="saveSystem()">Save System</button></div>
         </div>
     </div>
 
@@ -604,27 +598,13 @@
             } catch (e) { console.error(e); }
         }
 
-        // --- EXPORT FUNCTION (Fixed) ---
         function exportToCSV() {
             if (!allData.length) return alert("No Data");
-
-            // CSV Header with BOM for Excel
-            let csvContent = "\uFEFFBatch,System,Revision,Status,Total Mils,Layers Details\n";
-
+            let csvContent = "\uFEFFBatch,System,Revision,Status,Layers Details\n";
             allData.forEach(s => {
-                let size = 0;
-                let layersArr = (s.layers_data || []).map(l => {
-                    size += parseFloat(l.size) || 0;
-                    return `${l.name} (${l.size})`;
-                });
-
-                // Quote string to prevent commas breaking CSV
-                const layersStr = `"${layersArr.join(' | ')}"`;
-                const systemName = `"${s.system_name}"`;
-
-                csvContent += `${s.batch_number},${systemName},${s.revision_status},${s.completion_status},${size},${layersStr}\n`;
+                let layersArr = (s.layers_data || []).map(l => `${l.name} (${l.size} mils)`);
+                csvContent += `"${s.batch_number}","${s.system_name}","${s.revision_status}","${s.completion_status}","${layersArr.join(' | ')}"\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -637,7 +617,6 @@
             list.innerHTML = '';
             const batches = [...new Set(allData.map(d => d.batch_number).filter(Boolean))];
             if (currentBatch && !batches.includes(currentBatch)) batches.push(currentBatch);
-
             batches.forEach(b => {
                 const li = document.createElement('li');
                 li.className = `batch-item ${b === currentBatch ? 'active' : ''}`;
@@ -673,19 +652,21 @@
                 if (container) {
                     counter.innerText = parseInt(counter.innerText) + 1;
 
-                    let totalSize = 0;
                     let layersHtml = '';
                     (sys.layers_data || []).forEach(l => {
-                        totalSize += parseFloat(l.size) || 0;
-                        layersHtml += `<span class="layer-chip"><b>${l.name}</b>:${l.size}</span>`;
+                        layersHtml += `
+                            <div class="layer-detail-row">
+                                <span class="lname">${l.name}</span>
+                                <span class="lsize">${l.size} mils</span>
+                            </div>
+                        `;
                     });
 
                     const row = document.createElement('div');
                     row.className = `system-row ${sys.is_active_work ? 'active-work' : ''}`;
                     row.innerHTML = `
                         <div class="col-name">${sys.system_name} ${sys.is_active_work ? '🔥' : ''}</div>
-                        <div class="col-layers">${layersHtml || '<span style="color:#cbd5e1">-</span>'}</div>
-                        <div class="col-size">${totalSize} <small>Total Mils</small></div>
+                        <div class="col-layers">${layersHtml || '<span style="padding:10px; color:#cbd5e1; font-size:0.8rem">No layers defined</span>'}</div>
                         <div class="col-rev">${sys.revision_status}</div>
                         <div>
                             <select class="status-select" onchange="quickUpdateStatus(${sys.id}, this.value)">
@@ -708,41 +689,15 @@
             const sys = allData.find(s => s.id == id);
             if (!sys) return;
             const updatedData = { ...sys, completion_status: newStatus };
-            await fetch(`${API_URL}/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedData)
-            });
+            await fetch(`${API_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updatedData) });
             loadData();
         }
 
         function openBatchModal() { document.getElementById('newBatchName').value = ''; document.getElementById('batchModal').style.display = 'flex'; }
         function openDeleteBatchModal() { document.getElementById('delBatchName').innerText = currentBatch; document.getElementById('deleteBatchModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        async function confirmCreateBatch() {
-            const name = document.getElementById('newBatchName').value;
-            if (name) {
-                currentBatch = name;
-                renderSidebar();
-                renderContent(name);
-                closeModal('batchModal');
-            }
-        }
-
-        async function confirmDeleteBatch() {
-            if (currentBatch) {
-                await fetch(`/batches/${currentBatch}`, { method: 'DELETE' });
-                currentBatch = null;
-                await loadData();
-                closeModal('deleteBatchModal');
-                document.getElementById('contentArea').style.display = 'none';
-                document.getElementById('headerActions').style.display = 'none';
-                document.getElementById('quickNav').style.display = 'none';
-                document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('headerTitle').innerText = "Select a Batch";
-            }
-        }
+        async function confirmCreateBatch() { const name = document.getElementById('newBatchName').value; if (name) { currentBatch = name; renderSidebar(); renderContent(name); closeModal('batchModal'); } }
+        async function confirmDeleteBatch() { if (currentBatch) { await fetch(`/batches/${currentBatch}`, { method: 'DELETE' }); currentBatch = null; await loadData(); closeModal('deleteBatchModal'); document.getElementById('contentArea').style.display = 'none'; document.getElementById('headerActions').style.display = 'none'; document.getElementById('quickNav').style.display = 'none'; document.getElementById('emptyState').style.display = 'block'; document.getElementById('headerTitle').innerText = "Select a Batch"; } }
 
         function openSystemModal(sys = null) {
             document.getElementById('sysModal').style.display = 'flex';
