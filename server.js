@@ -11,9 +11,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(__dirname)); // Serves index.html
 
-// Database Connection (CHANGE THESE TO YOUR PASSWORD)
+// Database Connection
+const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_H6euGPY5oKik@ep-red-lab-a1jc72q0-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+
 const pool = new Pool({
-    connectionString: 'postgresql://neondb_owner:npg_H6euGPY5oKik@ep-red-lab-a1jc72q0-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
+    connectionString: connectionString,
     ssl: {
         rejectUnauthorized: false
     }
